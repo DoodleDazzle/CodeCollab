@@ -1,0 +1,191 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 3.9%;
+    --primary: 238 84% 59%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 0 0% 96.1%;
+    --secondary-foreground: 0 0% 9%;
+    --muted: 0 0% 96.1%;
+    --muted-foreground: 0 0% 45.1%;
+    --accent: 0 0% 96.1%;
+    --accent-foreground: 0 0% 9%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 89.8%;
+    --input: 0 0% 89.8%;
+    --ring: 238 84% 59%;
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: 0 0% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 0 0% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 238 84% 59%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 0 0% 14.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 0 0% 14.9%;
+    --muted-foreground: 0 0% 63.9%;
+    --accent: 0 0% 14.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 14.9%;
+    --input: 0 0% 14.9%;
+    --ring: 238 84% 59%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    scroll-behavior: smooth; /* Enable smooth scrolling */
+  }
+}
+
+/* Custom Cursor Styles */
+.cursor {
+  display: block;
+  width: 30px;
+  height: 30px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: transparent;
+  pointer-events: none;
+  z-index: 111;
+  border: 2px solid #fff;
+  transition: all 0.15s ease-out; /* Smooth transition */
+  animation: moveCursor1 0.8s ease-out infinite alternate; /* Slower animation */
+}
+
+.expand {
+  background: transparent;
+  animation: moveCursor2 0.5s forwards;
+  border: 1px solid yellow;
+}
+
+@keyframes moveCursor1 {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(0.8);
+  }
+}
+
+@keyframes moveCursor2 {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(2.5);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+
+/* Gradient Text Animation */
+@keyframes gradientAnimation {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.text-gradient {
+  font-size: 3rem; /* Adjust based on design */
+  font-weight: bold;
+  text-align: center;
+  background: linear-gradient(270deg, #293eff, rgba(144, 255, 144, 0.853), rgb(253, 89, 116), #2df4ff);
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradientAnimation 6s ease infinite;
+}
+
+/* Light Theme Gradient (optional) */
+body.light-theme .text-gradient {
+  background: linear-gradient(270deg, #ff5f6d, #ffcc33, #4285f4);
+}
+
+/* Smooth Page Transition (e.g., Fade-in) */
+html {
+  scroll-behavior: smooth; /* Smooth scrolling */
+}
+
+/* Prevent Layout Shifts */
+img, video {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Preload Key Assets */
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter.woff2') format('woff2');
+  font-display: swap; /* Avoids layout shifts by swapping with fallback font */
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('/fonts/JetBrainsMono.woff2') format('woff2');
+  font-display: swap; /* Avoids layout shifts */
+}
+
+/* Skeleton Loader (For loading states) */
+.skeleton-loader {
+  width: 100%;
+  height: 200px;
+  background-color: #e0e0e0;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0% {
+    background-color: #e0e0e0;
+  }
+  50% {
+    background-color: #f2f2f2;
+  }
+  100% {
+    background-color: #e0e0e0;
+  }
+}
+
+/* Add smooth animation for button hover states */
+.button {
+  transition: all 0.3s ease-in-out;
+}
+
+.button:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
