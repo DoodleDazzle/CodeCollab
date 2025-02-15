@@ -93,6 +93,8 @@ export default function SignInPage() {
         </p>
       </div>
 
+
+      
       <div className="space-y-6">
         {message && (
           <div className="p-3 text-sm text-green-500 bg-green-50 dark:bg-green-950/50 rounded-md">

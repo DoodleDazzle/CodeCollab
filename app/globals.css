@@ -57,6 +57,7 @@
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
     scroll-behavior: smooth; /* Enable smooth scrolling */
+    
   }
 }
 
@@ -80,8 +81,9 @@
 
 .expand {
   background: transparent;
-  animation: moveCursor2 0.5s forwards;
-  border: 1px solid yellow;
+  animation: moveCursor2 0.7s forwards;
+  border: 1px solid rgb(255, 24, 24);
+  
 }
 
 @keyframes moveCursor1 {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react"; // Import useState
 import Navbar from "@/components/navbar";
 import { Button } from "@/components/ui/button";
 import { Code2, Users } from "lucide-react";
@@ -22,9 +22,11 @@ const fadeInUp = {
 export default function Home() {
   const { user, loading } = useAuth(); // Ensure we check loading state
   const router = useRouter();
+  const [videoLoaded, setVideoLoaded] = useState(false); // State to manage video loading
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    setVideoLoaded(true); // Set videoLoaded to true only after component mounts
   }, []);
 
   const handleStartCoding = () => {
@@ -108,10 +110,12 @@ export default function Home() {
           Watch how CodeCollab AI enhances your coding experience.
         </p>
         <div className="flex justify-center">
-          <video className="rounded-lg border shadow-lg w-full max-w-2xl" controls>
-            <source src="/demo-video.mp4" type="video/mp4" />
-            Your browser does not support the video tag.
-          </video>
+          {videoLoaded && (
+            <video className="rounded-lg border shadow-lg w-full max-w-2xl" controls>
+              <source src="/demo-video.mp4" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          )}
         </div>
       </motion.section>
 
@@ -145,7 +149,44 @@ export default function Home() {
           </div>
         </div>
       </motion.section>
-
+  {/* Q&A Section */}
+  <motion.section
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.2 }}
+        variants={fadeInUp}
+        className="container py-20 text-center"
+      >
+        <h2 className="text-3xl font-bold mb-8">Frequently Asked Questions</h2>
+        <div className="space-y-6 max-w-3xl mx-auto text-left">
+          <div className="p-4 border rounded-lg bg-card">
+            <h3 className="font-semibold text-lg">What is CodeCollab AI?</h3>
+            <p className="text-muted-foreground">
+              CodeCollab AI is a collaborative coding platform that integrates AI assistance,
+              real-time teamwork, and analytics to improve your coding workflow.
+            </p>
+          </div>
+          <div className="p-4 border rounded-lg bg-card">
+            <h3 className="font-semibold text-lg">Do I need to install any software?</h3>
+            <p className="text-muted-foreground">
+              No, CodeCollab AI runs entirely in your browser. No installations or downloads required.
+            </p>
+          </div>
+          <div className="p-4 border rounded-lg bg-card">
+            <h3 className="font-semibold text-lg">Can I use AI assistance for free?</h3>
+            <p className="text-muted-foreground">
+              Yes, we offer a free tier with AI-powered suggestions. Additional features are available in premium plans.
+            </p>
+          </div>
+          <div className="p-4 border rounded-lg bg-card">
+            <h3 className="font-semibold text-lg">Is my code secure?</h3>
+            <p className="text-muted-foreground">
+              Absolutely! We use end-to-end encryption and strict security policies to protect your code.
+            </p>
+          </div>
+        </div>
+      </motion.section>
+      
       {/* Footer */}
       <motion.footer
         initial="hidden"
