@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
-import { User } from "@supabase/supabase-js";
+import { User, Session } from "@supabase/supabase-js";
 
 interface AuthContextType {
   user: User | null;
@@ -35,30 +35,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     getUser();
 
     // Listen for authentication state changes
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setUser(session?.user || null);
-
-        if (event === "SIGNED_IN") {
-          router.push("/"); // Redirect to homepage
-        } else if (event === "SIGNED_OUT") {
-          router.push("/"); // Redirect to sign-in
-        }
+    const {
+      data: authListener,
+      error,
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (error) {
+        console.error("Auth state change error:", error);
       }
-    );
+      setUser(session?.user || null);
+    });
 
-    // Cleanup subscription
     return () => {
-      authListener?.subscription?.unsubscribe();
+      authListener?.subscription.unsubscribe();
     };
-  }, [router]);
+  }, []);
 
   const signOut = async () => {
-    try {
-      await supabase.auth.signOut();
-    } catch (error) {
-      console.error("Error signing out:", error);
-    }
+    await supabase.auth.signOut();
+    setUser(null);
+    router.push("/");
   };
 
   return (
@@ -69,9 +64,5 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 }
 
 export function useAuth() {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
-  return context;
+  return useContext(AuthContext);
 }

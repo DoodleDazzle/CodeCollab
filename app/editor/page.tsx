@@ -10,13 +10,6 @@ import { MenuBar } from "@/components/editor/menu-bar";
 import { StatusBar } from "@/components/editor/status-bar";
 import { Button } from "@/components/ui/button";
 import { Play } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { createClient } from "@supabase/supabase-js";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
 
 export default function EditorPage() {
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
@@ -25,30 +18,15 @@ export default function EditorPage() {
   });
   const [output, setOutput] = useState<string>("");
   const [isRunning, setIsRunning] = useState(false);
-  const router = useRouter();
 
   useEffect(() => {
-    const checkAuth = async () => {
-      const { data } = await supabase.auth.getSession();
-      if (!data.session) {
-        router.push("/signin"); // Redirect if no session
-      }
-    };
-    checkAuth();
-  }, [router]);
-
-  // Auto-save functionality
-  useEffect(() => {
-    const saveInterval = setInterval(() => {
-      localStorage.setItem("editor-files", JSON.stringify(files));
-    }, 30000); // Auto-save every 30 seconds
-
-    return () => clearInterval(saveInterval);
+    if (selectedFile) {
+      localStorage.setItem("editor_files", JSON.stringify(files));
+    }
   }, [files]);
 
-  // Load saved files on initial render
   useEffect(() => {
-    const savedFiles = localStorage.getItem("editor-files");
+    const savedFiles = localStorage.getItem("editor_files");
     if (savedFiles) {
       setFiles(JSON.parse(savedFiles));
     }
@@ -62,25 +40,32 @@ export default function EditorPage() {
 
     try {
       const code = files[selectedFile];
-      const result = await new Promise((resolve) => {
-        const output: string[] = [];
-        const consoleLog = console.log;
+      let result = "";
 
-        console.log = (...args) => {
-          output.push(args.join(" "));
-        };
+      if (selectedFile.endsWith(".js")) {
+        result = await new Promise((resolve) => {
+          const output: string[] = [];
+          const consoleLog = console.log;
+          console.log = (...args) => output.push(args.join(" "));
+          try {
+            eval(code);
+            resolve(output.join("\n"));
+          } catch (error: any) {
+            resolve(`Error: ${error.message}`);
+          } finally {
+            console.log = consoleLog;
+          }
+        });
+      } else if (selectedFile.endsWith(".html")) {
+        const newWindow = window.open("", "_blank");
+        newWindow?.document.write(code);
+        newWindow?.document.close();
+        result = "HTML executed in a new tab.";
+      } else {
+        result = "Unsupported file type.";
+      }
 
-        try {
-          eval(code);
-          resolve(output.join("\n"));
-        } catch (error: any) {
-          resolve(`Error: ${error.message}`);
-        } finally {
-          console.log = consoleLog;
-        }
-      });
-
-      setOutput(result as string);
+      setOutput(result);
     } catch (error: any) {
       setOutput(`Error: ${error.message}`);
     } finally {
@@ -88,36 +73,30 @@ export default function EditorPage() {
     }
   };
 
-  const handleKeyDown = (e: KeyboardEvent) => {
-    if ((e.ctrlKey || e.metaKey) && e.key === "s") {
-      e.preventDefault();
-      localStorage.setItem("editor-files", JSON.stringify(files));
+  const handleFileCreate = (name: string) => {
+    if (files[name]) {
+      let count = 1;
+      let newName = name;
+      while (files[newName]) {
+        newName = `${name.split(".")[0]}_${count}.${name.split(".")[1]}`;
+        count++;
+      }
+      name = newName;
     }
-    if ((e.ctrlKey || e.metaKey) && e.key === "r") {
-      e.preventDefault();
-      handleRunCode();
-    }
+    setFiles((prev) => ({ ...prev, [name]: "" }));
+    setSelectedFile(name);
   };
-
-  useEffect(() => {
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [files, selectedFile]);
 
   return (
     <div className="h-screen flex flex-col bg-background">
       <MenuBar />
-
       <ResizablePanelGroup direction="horizontal" className="flex-1">
         <ResizablePanel defaultSize={20} minSize={15} maxSize={30}>
           <FileExplorer
             files={files}
             selectedFile={selectedFile}
             onFileSelect={setSelectedFile}
-            onFileCreate={(name) => {
-              setFiles((prev) => ({ ...prev, [name]: "" }));
-              setSelectedFile(name);
-            }}
+            onFileCreate={handleFileCreate}
             onFileDelete={(name) => {
               setFiles((prev) => {
                 const newFiles = { ...prev };
@@ -159,6 +138,9 @@ export default function EditorPage() {
                     automaticLayout: true,
                     tabSize: 2,
                     wordWrap: "on",
+                    suggestOnTriggerCharacters: true,
+                    quickSuggestions: true,
+                    autoClosingBrackets: "always",
                   }}
                 />
               )}
@@ -180,7 +162,6 @@ export default function EditorPage() {
           <Terminal output={output} />
         </ResizablePanel>
       </ResizablePanelGroup>
-
       <StatusBar />
     </div>
   );

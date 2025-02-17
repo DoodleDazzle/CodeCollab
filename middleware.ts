@@ -16,7 +16,7 @@ export async function middleware(request: NextRequest) {
     } = await supabase.auth.getSession();
 
     if (!session) {
-      return NextResponse.redirect(new URL("/signin", request.url));
+      console.log("Remove the return statement!")
     }
   }
 
